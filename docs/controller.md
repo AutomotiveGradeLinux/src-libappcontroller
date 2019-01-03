@@ -16,9 +16,39 @@
 
 ## Installation
 
-* Controller can easily be included as a git submodule in any AGL service or application binder.
-* Dependencies: the only dependencies are AGL application framework (https://gerrit.automotivelinux.org/gerrit/p/src/app-framework-binder.git) and app-afb-helpers-submodule (https://gerrit.automotivelinux.org/gerrit/p/apps/app-afb-helpers-submodule.git).
+* Controller can easily be included as a separate libray in any AGL service or application binder.
+* Dependencies: the only dependencies are [AGL application framework](https://gerrit.automotivelinux.org/gerrit/p/src/app-framework-binder.git)
+ and [libafb-helpers](https://gerrit.automotivelinux.org/gerrit/p/src/libafb-helpers.git).
 * Controller relies on Lua-5.3, when not needed Lua might be removed at compilation time.
+
+The controller library is integrated by default in the AGL SDK since GG (>=7)
+and is also available as a package for the AGL supported linux distributions.
+
+To install the native package please refer to [this chapter](../host-configuration/docs/1_Prerequisites.md)
+in the AGL documentation to install the AGL repository for your distribution.
+
+Then use your package manager to install the library.
+
+### OpenSuse
+
+```bash
+sudo zypper ref
+sudo zypper install agl-libappcontroller-devel
+```
+
+### Fedora
+
+```bash
+sudo dnf ref
+sudo dnf install agl-libappcontroller-devel
+```
+
+### Ubuntu/Debian
+
+```bash
+sudo apt-get update
+sudo apt-get install agl-libappcontroller-dev
+```
 
 ## Monitoring
 
