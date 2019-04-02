@@ -91,7 +91,10 @@ typedef enum {
   CTL_SECTION_ENDTAG,
 } SectionEnumT;
 
-// ctl-action.c
+/*******************************************************************************
+ *                               ctl-action.h                                  *
+ ******************************************************************************/
+
 extern int AddActionsToSection(afb_api_t apiHandle, CtlSectionT *section, json_object *actionsJ, int exportApi);
 extern CtlActionT *ActionConfig(afb_api_t apiHandle, json_object *actionsJ,  int exportApi);
 extern void ActionExecUID(afb_req_t request, CtlConfigT *ctlConfig, const char *uid, json_object *queryJ);
@@ -99,13 +102,38 @@ extern int ActionExecOne( CtlSourceT *source, CtlActionT* action, json_object *q
 extern int ActionLoadOne(afb_api_t apiHandle, CtlActionT *action, json_object *, int exportApi);
 extern int ActionLabelToIndex(CtlActionT* actions, const char* actionLabel);
 
-// ctl-config.c
+/*******************************************************************************
+ *                               ctl-config.h                                  *
+ ******************************************************************************/
+
 extern int CtlConfigMagicNew();
 extern void* getExternalData(CtlConfigT *ctlConfig);
 extern void setExternalData(CtlConfigT *ctlConfig, void *data);
 extern json_object* CtlConfigScan(const char *dirList, const char *prefix) ;
+
+/**
+ * @brief Return a string representing the path + filename for a given response
+ * object from a CtlConfigScan calls. This will only take the first result, this is
+ * made to avoid loading several time the same file found at differents places.
+ *
+ * The returned string has to be freed.
+ *
+ * @param apiHandle AppFW Api handle
+ * @param responseJ Response from a CtlConfigScan function call.
+ * @return char* absolute path to a file
+ */
 extern char* ConfigSearch(afb_api_t apiHandle, json_object *responseJ);
 extern char* CtlConfigSearch(afb_api_t apiHandle, const char *dirList, const char *prefix) ;
+
+/**
+ * @brief Best effort to initialise everything before starting
+ * Call afb_require_api at the first call or if there was an error because
+ * the CtlConfigExec could be called anywhere and not in binding init.
+ * So you could call this function at init time.
+ *
+ * @param apiHandle : an afb_daemon api handle, see AFB_ApiT in afb_definitions.h
+ * @param requireJ : json_object array of api name required.
+ */
 extern void DispatchRequireApi(afb_api_t apiHandle, json_object * requireJ);
 extern int CtlConfigExec(afb_api_t apiHandle, CtlConfigT *ctlConfig) ;
 extern CtlConfigT *CtlLoadMetaDataJson(afb_api_t apiHandle,json_object *ctlConfigJ, const char *prefix) ;
@@ -113,19 +141,51 @@ extern CtlConfigT *CtlLoadMetaDataUsingPrefix(afb_api_t apiHandle,const char* fi
 extern int CtlLoadSections(afb_api_t apiHandle, CtlConfigT *ctlHandle, CtlSectionT *sections);
 #define CtlLoadMetaData(api, filepath) CtlLoadMetaDataUsingPrefix(api, filepath, NULL)
 
-// ctl-event.c
+/*******************************************************************************
+ *                               ctl-event.h                                   *
+ ******************************************************************************/
+
 extern int EventConfig(afb_api_t apihandle, CtlSectionT *section, json_object *actionsJ);
 extern void CtrlDispatchApiEvent (afb_api_t apiHandle, const char *evtLabel, struct json_object *eventJ);
 extern void CtrlDispatchV2Event(const char *evtLabel, json_object *eventJ);
 
-// ctl-control.c
+/*******************************************************************************
+ *                               ctl-control.h                                 *
+ ******************************************************************************/
+
 extern int ControlConfig(afb_api_t apiHandle, CtlSectionT *section, json_object *actionsJ);
 
-// ctl-onload.c
+/*******************************************************************************
+ *                               ctl-onload.h                                  *
+ ******************************************************************************/
+
 extern int OnloadConfig(afb_api_t apiHandle, CtlSectionT *section, json_object *actionsJ);
 
-// ctl-plugin.c
+/*******************************************************************************
+ *                               ctl-plugin.h                                  *
+ ******************************************************************************/
+
+/**
+ * @brief Plugins definition loads. You have to call it at least twice, one for
+ * the configuration at binding preinit and the last one at init step to
+ * initilize a API interface for binding with version 2. The last call should
+ * not include any plugin definition to add.
+ *
+ * @param apiHandle an afb_daemon api handle, see AFB_ApiT in afb_definitions.h
+ * @param section The plugin section to process
+ * @param pluginsJ Json_object holding the plugins definitions to load.
+ * @return int 0 if success, other on failure
+ */
 extern int PluginConfig(afb_api_t UNUSED_ARG(apiHandle), CtlSectionT *section, json_object *pluginsJ);
+/**
+ * @brief Permit to find a C callback stored in a plugin to attach it to an
+ * action as well as the plugin.
+ *
+ * @param apiHandle an afb_daemon api handle, see AFB_ApiT in afb_definitions.h
+ * @param action Action structure to use to store the callback if found
+ * @param callbackJ the callback definition to search
+ * @return int 0 if success, other on failure
+ */
 extern int PluginGetCB (afb_api_t apiHandle, CtlActionT *action , json_object *callbackJ);
 extern void* getPluginContext(CtlPluginT *plugin);
 extern void setPluginContext(CtlPluginT *plugin, void *context);
