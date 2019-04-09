@@ -536,7 +536,7 @@ static int LuaAfbEventPush(lua_State* luaState) {
         return 1;
     }
 
-    json_object *ctlEventJ = LuaTableToJson(source, luaState, LUA_FIRST_ARG + 2);
+    json_object *ctlEventJ = LuaPopOneArg(source, luaState, LUA_FIRST_ARG + 2);
     if (!ctlEventJ) {
         lua_pushliteral(luaState, "LuaAfbEventPush: Syntax is AFB:signal ([evtHandle], {lua table})");
         lua_error(luaState);
